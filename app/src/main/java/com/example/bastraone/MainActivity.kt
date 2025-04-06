@@ -559,11 +559,21 @@ class MainActivity : AppCompatActivity() {
         team2ScoreTextView.text = "Team 2: ${scores[1]} points"
 
         // Update table cards
+//        val tableCards = game.getTableCards()
+//        tableCardsView.adapter = CardAdapter(tableCards, { _ ->
+//            // Nothing happens when clicking table cards
+//        }, resources.getDimensionPixelSize(R.dimen.card_width))
         val tableCards = game.getTableCards()
-        tableCardsView.adapter = CardAdapter(tableCards, { _ ->
+// Show only the last card if there are cards on the table
+        val visibleTableCards = if (tableCards.isNotEmpty()) {
+            listOf(tableCards.last())
+        } else {
+            emptyList()
+        }
+
+        tableCardsView.adapter = CardAdapter(visibleTableCards, { _ ->
             // Nothing happens when clicking table cards
         }, resources.getDimensionPixelSize(R.dimen.card_width))
-
         // Update game log
         val logMessages = game.getLogMessages().takeLast(5)
         gameLogTextView.text = logMessages.joinToString("\n")
@@ -668,15 +678,16 @@ class MainActivity : AppCompatActivity() {
 
     // Helper method to show Bastra celebration animation
     private fun showBastraAnimation() {
-        // You would implement a special animation here
-        // For example, flashing text or special effects
-        val bastraText = findViewById<TextView>(R.id.bastraText)
-        bastraText.visibility = View.VISIBLE
+        val pastraText = findViewById<TextView>(R.id.bastraText)
+        pastraText.visibility = View.VISIBLE
         val anim = AnimationUtils.loadAnimation(this, R.anim.bastra_flash)
-        bastraText.startAnimation(anim)
+        pastraText.startAnimation(anim)
 
+        // Ensure animation cleanup with a firm handler timeout
+        handler.removeCallbacksAndMessages(null) // Remove any pending callbacks
         handler.postDelayed({
-            bastraText.visibility = View.INVISIBLE
+            pastraText.clearAnimation() // Clear any ongoing animations
+            pastraText.visibility = View.INVISIBLE
         }, 1500)
     }
 

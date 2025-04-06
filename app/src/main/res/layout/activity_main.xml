@@ -47,7 +47,10 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tableCardsRecyclerView"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
         android:layout_height="120dp"
         android:layout_marginVertical="8dp"/>
 
