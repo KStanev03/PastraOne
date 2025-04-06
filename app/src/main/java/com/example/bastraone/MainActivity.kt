@@ -104,10 +104,11 @@ enum class Suit {
     }
 }
 
-// Player class (mostly unchanged)
+// Player class with added Bastra points tracking
 class Player(val name: String, val teamId: Int, val isHuman: Boolean = false) {
     val hand = mutableListOf<Card>()
     val capturedCards = mutableListOf<Card>()
+    var bastraPoints = 0 // Track Bastra points separately
 
     fun playCard(index: Int): Card {
         return hand.removeAt(index)
@@ -121,11 +122,17 @@ class Player(val name: String, val teamId: Int, val isHuman: Boolean = false) {
         capturedCards.addAll(cards)
     }
 
+    fun addBastraPoints(points: Int) {
+        bastraPoints += points
+    }
+
     fun getScore(): Int {
         var score = 0
         for (card in capturedCards) {
             score += card.getPoints()
         }
+        // Add the Bastra bonus points to the score
+        score += bastraPoints
         return score
     }
 }
@@ -189,7 +196,7 @@ class CardAdapter(
     override fun getItemCount() = cards.size
 }
 
-// Game class (logic mostly unchanged but with animation flags)
+// Game class with fixed Bastra points
 class BastraGame {
     private val deck = mutableListOf<Card>()
     private val tableCards = mutableListOf<Card>()
@@ -260,8 +267,7 @@ class BastraGame {
         addToLog("Next round: 4 new cards dealt to each player.")
     }
 
-    // Updated play turn with animation info
-    // Updated play turn function with correct capturing logic
+    // Updated play turn function with correct capturing logic and proper Bastra points
     fun playTurn(cardIndex: Int): PlayResult {
         val currentPlayer = players[currentPlayerIndex]
         if (cardIndex >= currentPlayer.hand.size) {
@@ -288,6 +294,8 @@ class BastraGame {
                 if (tableCards.size == 1 && tableCards[0].rank == Rank.JACK) {
                     isBastra = true
                     bastraPoints = 20
+                    // Add the Bastra points to the player's score
+                    currentPlayer.addBastraPoints(bastraPoints)
                     addToLog("BASTRA with Jack! ${currentPlayer.name} gets 20 extra points!")
                 }
 
@@ -310,6 +318,8 @@ class BastraGame {
             if (tableCards.size == 1) {
                 isBastra = true
                 bastraPoints = 10
+                // Add the Bastra points to the player's score
+                currentPlayer.addBastraPoints(bastraPoints)
                 addToLog("BASTRA! ${currentPlayer.name} gets 10 extra points!")
             }
 
@@ -344,6 +354,7 @@ class BastraGame {
             capturedCards
         )
     }
+
     // AI play (unchanged)
     fun playAITurn(): PlayResult {
         val aiPlayer = players[currentPlayerIndex]
