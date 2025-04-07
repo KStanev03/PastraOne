@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import com.example.pastraone.domain.game.BastraGame
+import com.example.pastraone.ui.game.adapter.CardAdapter
 
 
 class MainActivity : AppCompatActivity() {
