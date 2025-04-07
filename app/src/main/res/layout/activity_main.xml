@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:padding="16dp">
 
     <!-- Scores -->
     <LinearLayout
+        android:id="@+id/scoresLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="2">
+        android:weightSum="2"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/team1ScoreTextView"
@@ -36,35 +38,120 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:gravity="center"
-        android:layout_marginVertical="8dp"/>
+        android:layout_marginVertical="8dp"
+        app:layout_constraintTop_toBottomOf="@id/scoresLayout"/>
+
+    <!-- Player 2 Position (Left) -->
+    <FrameLayout
+        android:id="@+id/player2Position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="4dp">
+
+        <ImageView
+            android:id="@+id/player2CardView"
+            android:layout_width="80dp"
+            android:layout_height="100dp"
+            android:src="@drawable/card_back"
+            android:rotation="90"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Player 2"
+            android:textSize="12sp"
+            android:layout_gravity="center"/>
+    </FrameLayout>
+
+    <!-- Player 3 Position (Top/Partner) -->
+    <FrameLayout
+        android:id="@+id/player3Position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/statusTextView"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="8dp">
+
+        <ImageView
+            android:id="@+id/player3CardView"
+            android:layout_width="80dp"
+            android:layout_height="100dp"
+            android:src="@drawable/card_back"
+            android:rotation="180"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Partner"
+            android:textSize="12sp"
+            android:layout_gravity="center"/>
+    </FrameLayout>
+
+    <!-- Player 4 Position (Right) -->
+    <FrameLayout
+        android:id="@+id/player4Position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="4dp">
+
+        <ImageView
+            android:id="@+id/player4CardView"
+            android:layout_width="80dp"
+            android:layout_height="100dp"
+            android:src="@drawable/card_back"
+            android:rotation="-90"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Player 4"
+            android:textSize="12sp"
+            android:layout_gravity="center"/>
+    </FrameLayout>
 
     <!-- Table Cards -->
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/tableCardsLabel"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Table Cards:"
-        android:textSize="16sp"/>
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/player3Position"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="8dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tableCardsRecyclerView"
         android:layout_width="wrap_content"
-        android:layout_gravity="center"
+        android:layout_height="120dp"
         android:clipToPadding="false"
         android:paddingHorizontal="16dp"
-        android:layout_height="120dp"
-        android:layout_marginVertical="8dp"/>
+        app:layout_constraintTop_toBottomOf="@id/tableCardsLabel"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
 
     <!-- Game Log -->
     <TextView
+        android:id="@+id/logLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Game Log:"
-        android:textSize="16sp"/>
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/tableCardsRecyclerView"
+        android:layout_marginTop="8dp"/>
 
     <ScrollView
+        android:id="@+id/logScrollView"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_marginVertical="8dp">
+        app:layout_constraintTop_toBottomOf="@id/logLabel">
 
         <TextView
             android:id="@+id/gameLogTextView"
@@ -73,18 +160,22 @@
             android:textSize="14sp"/>
     </ScrollView>
 
-    <!-- Player Hand -->
+    <!-- Player Hand (always at bottom) -->
     <TextView
+        android:id="@+id/yourHandLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Your Hand:"
-        android:textSize="16sp"/>
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@id/playerHandRecyclerView"
+        android:layout_marginBottom="4dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/playerHandRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:layout_marginVertical="8dp"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"/>
 
     <!-- Next Button -->
     <Button
@@ -92,15 +183,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Next Turn"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"/>
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/yourHandLabel"
+        android:layout_marginBottom="16dp"/>
 
     <!-- Animation Container -->
     <FrameLayout
         android:id="@+id/playCardView"
         android:layout_width="100dp"
         android:layout_height="140dp"
-        android:layout_gravity="center"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:visibility="invisible">
 
         <ImageView
@@ -118,7 +213,9 @@
         android:text="BASTRA!"
         android:textSize="36sp"
         android:textColor="#FFD700"
-        android:layout_gravity="center"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:visibility="invisible"/>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,4 +1,6 @@
-package com.example.pastraone
+package com.example.pastraone.domain.model
+
+import com.example.pastraone.R
 
 
 data class Card(val rank: Rank, val suit: Suit) {

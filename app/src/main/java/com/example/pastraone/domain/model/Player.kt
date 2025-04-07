@@ -1,4 +1,4 @@
-package com.example.pastraone
+package com.example.pastraone.domain.model
 
 // Player class with added Bastra points tracking
 class Player(val name: String, val teamId: Int, val isHuman: Boolean = false) {

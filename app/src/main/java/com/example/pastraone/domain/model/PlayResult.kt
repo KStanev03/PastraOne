@@ -1,4 +1,4 @@
-package com.example.pastraone
+package com.example.pastraone.domain.model
 
 data class PlayResult(
     val success: Boolean,

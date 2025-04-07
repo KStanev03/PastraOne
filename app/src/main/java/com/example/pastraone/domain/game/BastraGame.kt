@@ -1,12 +1,12 @@
-package com.example.pastraone.domain.model
+package com.example.pastraone.domain.game
 
 
-import com.example.pastraone.Card
-import com.example.pastraone.PlayResult
-import com.example.pastraone.Player
-import com.example.pastraone.Rank
-import com.example.pastraone.Suit
-import com.example.pastraone.Team
+import com.example.pastraone.domain.model.Card
+import com.example.pastraone.domain.model.PlayResult
+import com.example.pastraone.domain.model.Player
+import com.example.pastraone.domain.model.Rank
+import com.example.pastraone.domain.model.Suit
+import com.example.pastraone.domain.model.Team
 import kotlin.random.Random
 
 class BastraGame {

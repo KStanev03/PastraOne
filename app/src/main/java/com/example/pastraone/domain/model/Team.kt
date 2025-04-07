@@ -1,4 +1,4 @@
-package com.example.pastraone
+package com.example.pastraone.domain.model
 
 class Team(val id: Int, val name: String) {
     val players = mutableListOf<Player>()

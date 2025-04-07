@@ -15,12 +15,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
-import com.example.pastraone.domain.model.BastraGame
+import com.example.pastraone.domain.game.BastraGame
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var game: BastraGame
-    private lateinit var handRecyclerView: RecyclerView
+    private lateinit var humanHandRecyclerView: RecyclerView
     private lateinit var tableCardsView: RecyclerView
     private lateinit var statusTextView: TextView
     private lateinit var team1ScoreTextView: TextView
@@ -28,6 +28,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gameLogTextView: TextView
     private lateinit var playCardView: FrameLayout
     private lateinit var nextButton: Button
+
+    // Player card views for visualization
+    private lateinit var player2CardView: ImageView
+    private lateinit var player3CardView: ImageView
+    private lateinit var player4CardView: ImageView
 
     private var humanPlayerIndex = 0
     private val handler = Handler(Looper.getMainLooper())
@@ -45,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Initialize UI components
-        handRecyclerView = findViewById(R.id.playerHandRecyclerView)
+        humanHandRecyclerView = findViewById(R.id.playerHandRecyclerView)
         tableCardsView = findViewById(R.id.tableCardsRecyclerView)
         statusTextView = findViewById(R.id.statusTextView)
         team1ScoreTextView = findViewById(R.id.team1ScoreTextView)
@@ -54,8 +59,13 @@ class MainActivity : AppCompatActivity() {
         playCardView = findViewById(R.id.playCardView)
         nextButton = findViewById(R.id.nextButton)
 
+        // Initialize AI player card views
+        player2CardView = findViewById(R.id.player2CardView)
+        player3CardView = findViewById(R.id.player3CardView)
+        player4CardView = findViewById(R.id.player4CardView)
+
         // Set up RecyclerViews
-        handRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        humanHandRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         tableCardsView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         // Set up play area for animations
@@ -92,6 +102,17 @@ class MainActivity : AppCompatActivity() {
         val currentPlayer = game.getCurrentPlayer()
         val isHumanTurn = currentPlayer.isHuman
 
+        // Always show human player's hand
+        val humanPlayer = game.getPlayers().first { it.isHuman }
+        humanHandRecyclerView.adapter = CardAdapter(humanPlayer.hand, { cardIndex ->
+            if (!isAnimating && isHumanTurn) {
+                handleCardPlay(cardIndex)
+            }
+        }, resources.getDimensionPixelSize(R.dimen.card_width))
+
+        // Only enable card clicks during human's turn
+        humanHandRecyclerView.alpha = if (isHumanTurn) 1.0f else 0.6f
+
         // Update status
         statusTextView.text = "Current player: ${currentPlayer.name}"
 
@@ -101,12 +122,8 @@ class MainActivity : AppCompatActivity() {
         team2ScoreTextView.text = "Team 2: ${scores[1]} points"
 
         // Update table cards
-//        val tableCards = game.getTableCards()
-//        tableCardsView.adapter = CardAdapter(tableCards, { _ ->
-//            // Nothing happens when clicking table cards
-//        }, resources.getDimensionPixelSize(R.dimen.card_width))
         val tableCards = game.getTableCards()
-// Show only the last card if there are cards on the table
+        // Show only the last card if there are cards on the table
         val visibleTableCards = if (tableCards.isNotEmpty()) {
             listOf(tableCards.last())
         } else {
@@ -116,25 +133,16 @@ class MainActivity : AppCompatActivity() {
         tableCardsView.adapter = CardAdapter(visibleTableCards, { _ ->
             // Nothing happens when clicking table cards
         }, resources.getDimensionPixelSize(R.dimen.card_width))
+
         // Update game log
         val logMessages = game.getLogMessages().takeLast(5)
         gameLogTextView.text = logMessages.joinToString("\n")
 
-        if (isHumanTurn) {
-            // Update player hand only when it's human's turn
-            handRecyclerView.adapter = CardAdapter(currentPlayer.hand, { cardIndex ->
-                if (!isAnimating) {
-                    handleCardPlay(cardIndex)
-                }
-            }, resources.getDimensionPixelSize(R.dimen.card_width))
-            nextButton.visibility = View.GONE
-            handRecyclerView.visibility = View.VISIBLE
-        } else {
-            // Show empty hand for AI's turn
-            handRecyclerView.adapter = CardAdapter(emptyList(), { _ -> })
-            nextButton.visibility = View.VISIBLE
-            handRecyclerView.visibility = View.INVISIBLE
-        }
+        // Show/hide next button based on whose turn it is
+        nextButton.visibility = if (isHumanTurn) View.GONE else View.VISIBLE
+
+        // Highlight current player's position
+        highlightCurrentPlayer(currentPlayer)
 
         // Check if game is complete
         if (game.isGameComplete()) {
@@ -148,7 +156,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Improved card play with animations
+    // Function to highlight the current player
+    private fun highlightCurrentPlayer(currentPlayer: Player) {
+        // Reset all highlights
+        player2CardView.alpha = 0.7f
+        player3CardView.alpha = 0.7f
+        player4CardView.alpha = 0.7f
+        humanHandRecyclerView.alpha = 0.7f
+
+        // Highlight current player
+        val players = game.getPlayers()
+        when (players.indexOf(currentPlayer)) {
+            0 -> humanHandRecyclerView.alpha = 1.0f // Human player
+            1 -> player2CardView.alpha = 1.0f       // Left AI player
+            2 -> player3CardView.alpha = 1.0f       // Top AI player (partner)
+            3 -> player4CardView.alpha = 1.0f       // Right AI player
+        }
+    }
+
+    // Improved card play with animations and direction based on player position
     private fun handleCardPlay(cardIndex: Int) {
         isAnimating = true
 
@@ -239,10 +265,19 @@ class MainActivity : AppCompatActivity() {
 
         isAnimating = true
         val currentPlayer = game.getCurrentPlayer()
+        val playerIndex = game.getPlayers().indexOf(currentPlayer)
 
         if (!currentPlayer.isHuman) {
             // Show thinking animation
             statusTextView.text = "${currentPlayer.name} is thinking..."
+
+            // Determine which direction animation should come from based on player position
+            val animIn = when (playerIndex) {
+                1 -> AnimationUtils.loadAnimation(this, R.anim.card_play_from_left)
+                2 -> AnimationUtils.loadAnimation(this, R.anim.card_play_from_top)
+                3 -> AnimationUtils.loadAnimation(this, R.anim.card_play_from_right)
+                else -> AnimationUtils.loadAnimation(this, R.anim.card_play_in)
+            }
 
             // Delay to make it feel more natural
             handler.postDelayed({
@@ -255,8 +290,7 @@ class MainActivity : AppCompatActivity() {
                     playedCardImage.setImageResource(game.lastPlayedCard!!.getImageResourceId())
                     playCardView.visibility = View.VISIBLE
 
-                    // Apply card play animation
-                    val animIn = AnimationUtils.loadAnimation(this, R.anim.card_play_in)
+                    // Apply card play animation based on player position
                     playCardView.startAnimation(animIn)
 
                     // After animation, update the table

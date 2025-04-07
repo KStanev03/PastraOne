@@ -1,4 +1,4 @@
-package com.example.pastraone
+package com.example.pastraone.domain.model
 
 enum class Suit {
     CLUBS, DIAMONDS, HEARTS, SPADES;

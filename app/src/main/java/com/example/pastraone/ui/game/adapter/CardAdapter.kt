@@ -1,4 +1,4 @@
-package com.example.pastraone
+package com.example.pastraone.ui.game.adapter
 
 import android.os.Handler
 import android.os.Looper
@@ -8,6 +8,8 @@ import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.pastraone.R
+import com.example.pastraone.domain.model.Card
 
 class CardAdapter(
     private val cards: List<Card>,
